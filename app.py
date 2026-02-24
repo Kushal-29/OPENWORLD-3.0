@@ -159,13 +159,13 @@ def health():
     return {'status': 'ok'}, 200
 
 # ======================
-# MAIN
+# MAIN (LOCAL DEV ONLY)
 # ======================
 if __name__ == "__main__":
     local_ip = get_local_ip()
 
     print("\n" + "="*50)
-    print("🚀 OPENWORLD VIDEO CHAT")
+    print("🚀 OPENWORLD VIDEO CHAT (DEV MODE)")
     print("="*50)
     print(f"Local:   http://localhost:5000")
     print(f"Network: http://{local_ip}:5000")
@@ -176,5 +176,5 @@ if __name__ == "__main__":
         host="0.0.0.0",
         port=5000,
         debug=True,
-        use_reloader=False
+        allow_unsafe_werkzeug=True
     )
