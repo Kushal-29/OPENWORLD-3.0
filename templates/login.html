@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+
+{% block title %}Login - OPENWORLD{% endblock %}
+
+{% block content %}
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; min-height: calc(100vh - 80px); padding: 40px 0;">
+    
+    <!-- LEFT SIDE - BRANDING -->
+    <div style="padding: 40px; text-align: center;">
+        <h1 style="font-size: 56px; font-weight: 900; margin-bottom: 24px; color: #FFFFFF; letter-spacing: -2px;">
+            OPENWORLD
+        </h1>
+        <p style="font-size: 20px; color: var(--text-primary); line-height: 1.6; margin-bottom: 20px; font-weight: 500;">
+            Connect with people worldwide
+        </p>
+        <p style="font-size: 15px; color: var(--text-secondary); line-height: 1.6;">
+            Experience real-time video chat with random users, build meaningful connections, and expand your social network across the globe.
+        </p>
+    </div>
+
+    <!-- RIGHT SIDE - FORM -->
+    <div style="padding: 40px;">
+        <form method="POST" style="background-color: var(--bg-secondary); border: 1px solid var(--border-primary); border-radius: 16px; padding: 32px; max-width: 100%;">
+            <h2 style="margin-bottom: 32px; font-size: 22px; font-weight: 700; letter-spacing: -0.5px;">Welcome back</h2>
+
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input 
+                    type="text" 
+                    id="username"
+                    name="username" 
+                    placeholder="Enter your username" 
+                    required 
+                    autofocus>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <div style="position: relative;">
+                    <input 
+                        type="password" 
+                        id="password"
+                        name="password" 
+                        placeholder="Enter your password" 
+                        required>
+                    <button 
+                        type="button"
+                        onclick="togglePassword()"
+                        style="position: absolute; right: 14px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--text-secondary); cursor: pointer; font-size: 18px; padding: 0; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; transition: color 0.2s ease;"
+                        onmouseover="this.style.color='#FFFFFF'"
+                        onmouseout="this.style.color='var(--text-secondary)'">
+                        👁️
+                    </button>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-block" style="padding: 14px; margin-top: 24px; font-size: 15px; font-weight: 700;">
+                Log In
+            </button>
+
+            <div style="margin-top: 24px; text-align: center; border-top: 1px solid var(--border-primary); padding-top: 24px;">
+                <p style="color: var(--text-secondary); margin-bottom: 12px; font-size: 14px;">
+                    Don't have an account?
+                </p>
+                <a href="{{ url_for('auth.register') }}" 
+                   style="color: #FFFFFF; text-decoration: none; font-weight: 700; font-size: 15px; transition: color 0.2s ease;"
+                   onmouseover="this.style.color='#E8E8E8'"
+                   onmouseout="this.style.color='#FFFFFF'">
+                    Create new account
+                </a>
+            </div>
+        </form>
+    </div>
+
+</div>
+
+<script>
+function togglePassword() {
+    const passInput = document.getElementById('password');
+    const btn = event.target;
+    
+    if (passInput.type === 'password') {
+        passInput.type = 'text';
+        btn.textContent = '🙈';
+    } else {
+        passInput.type = 'password';
+        btn.textContent = '👁️';
+    }
+}
+</script>
+
+<style>
+    @media (max-width: 1024px) {
+        main > div {
+            grid-template-columns: 1fr !important;
+            gap: 30px !important;
+        }
+        
+        main > div > div:first-child {
+            display: none;
+        }
+    }
+
+    @media (max-width: 768px) {
+        main > div {
+            padding: 20px !important;
+        }
+
+        main > div > div {
+            padding: 20px !important;
+        }
+    }
+</style>
+{% endblock %}

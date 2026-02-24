@@ -1,0 +1,272 @@
+{% extends "base.html" %}
+
+{% block title %}Messages - OPENWORLD{% endblock %}
+
+{% block content %}
+<div class="chat-container">
+    
+    <!-- LEFT SIDEBAR - FRIENDS LIST -->
+    <div class="chat-sidebar">
+        <div class="chat-sidebar-header">Messages</div>
+        
+        {% if current_user.friends %}
+            {% for f in current_user.friends %}
+                <a href="{{ url_for('chat.chat_window', user_id=f.id) }}" 
+                   class="chat-item {% if f.id == friend.id %}active{% endif %}"
+                   style="display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-bottom: 1px solid var(--border-primary); cursor: pointer; text-decoration: none; color: var(--text-primary); transition: background-color 0.2s ease;"
+                   onmouseover="this.style.backgroundColor='var(--bg-secondary)'"
+                   onmouseout="this.style.backgroundColor='{% if f.id == friend.id %}rgba(29, 161, 242, 0.1){% else %}transparent{% endif %}'">
+                    
+                    <img src="/static/uploads/profiles/{{ f.profile_pic }}" 
+                         alt="{{ f.username }}"
+                         class="chat-item-avatar"
+                         style="width: 48px; height: 48px; border-radius: 50%; object-fit: cover; flex-shrink: 0;"
+                         onerror="this.src='/static/uploads/profiles/default.png'">
+                    
+                    <div class="chat-item-info" style="flex: 1; min-width: 0;">
+                        <div class="chat-item-name" style="font-weight: 600; font-size: 14px; color: var(--text-primary);">{{ f.full_name or f.username }}</div>
+                        <div class="chat-item-preview" style="color: var(--text-secondary); font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Click to chat</div>
+                    </div>
+                </a>
+            {% endfor %}
+        {% else %}
+            <div style="padding: 16px; color: var(--text-secondary); text-align: center; font-size: 14px;">
+                No friends yet
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- RIGHT SIDE - MAIN CHAT AREA -->
+    <div class="chat-main">
+        
+        <!-- HEADER -->
+        <div class="chat-header">
+            <div class="chat-header-info">
+                <img src="/static/uploads/profiles/{{ friend.profile_pic }}" 
+                     alt="{{ friend.username }}"
+                     class="chat-item-avatar"
+                     style="width: 40px; height: 40px;"
+                     onerror="this.src='/static/uploads/profiles/default.png'">
+                <div>
+                    <div style="font-weight: 600; font-size: 15px; color: var(--text-primary);">{{ friend.full_name or friend.username }}</div>
+                    <div style="color: var(--text-secondary); font-size: 13px;">@{{ friend.username }}</div>
+                </div>
+            </div>
+            <div>
+                <a href="{{ url_for('profile.view_profile', user_id=friend.id) }}" class="btn btn-secondary" style="padding: 8px 16px; font-size: 14px; text-decoration: none;">
+                    View Profile
+                </a>
+            </div>
+        </div>
+
+        <!-- MESSAGES -->
+        <div class="chat-messages" id="messagesContainer">
+            {% if messages %}
+                {% for msg in messages %}
+                    <div class="message {% if msg.sender_id == current_user.id %}sent{% else %}received{% endif %}">
+                        <div class="message-content">
+                            {% if msg.text %}
+                                <div class="message-text">{{ msg.text }}</div>
+                            {% endif %}
+                            {% if msg.image %}
+                                <div class="message-image">
+                                    <img src="/static/uploads/chat/{{ msg.image }}" 
+                                         alt="Image"
+                                         onerror="this.src='/static/images/error.png'">
+                                </div>
+                            {% endif %}
+                            {% if msg.document %}
+                                <a href="/static/uploads/chat/{{ msg.document }}" 
+                                   class="message-text"
+                                   style="display: inline-flex; align-items: center; gap: 8px;">
+                                    📄 {{ msg.document }}
+                                </a>
+                            {% endif %}
+                            <div class="message-time">{{ msg.created_at.strftime('%H:%M') }}</div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div style="text-align: center; color: var(--text-secondary); padding: 40px 20px; display: flex; align-items: center; justify-content: center; height: 100%;">
+                    <div>
+                        <p style="font-size: 16px; margin-bottom: 8px; font-weight: 500;">Say hello!</p>
+                        <p style="font-size: 14px;">Send your first message to start chatting</p>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- INPUT AREA -->
+        <div class="chat-input-area">
+            <!-- EMOJI PICKER BUTTON -->
+            <div style="position: relative;">
+                <button type="button" 
+                        class="chat-emoji-btn"
+                        onclick="toggleEmojiPicker()"
+                        title="Add emoji">
+                    😊
+                </button>
+                
+                <div class="emoji-picker" id="emojiPicker">
+                    <button type="button" class="emoji-btn" onclick="insertEmoji('😀')">😀</button>
+                    <button type="button" class="emoji-btn" onclick="insertEmoji('😂')">😂</button>
+                    <button type="button" class="emoji-btn" onclick="insertEmoji('😍')">😍</button>
+                    <button type="button" class="emoji-btn" onclick="insertEmoji('🤔')">🤔</button>
+                    <button type="button" class="emoji-btn" onclick="insertEmoji('👍')">👍</button>
+                    <button type="button" class="emoji-btn" onclick="insertEmoji('🎉')">🎉</button>
+                    <button type="button" class="emoji-btn" onclick="insertEmoji('❤️')">❤️</button>
+                    <button type="button" class="emoji-btn" onclick="insertEmoji('🔥')">🔥</button>
+                </div>
+            </div>
+
+            <!-- MESSAGE INPUT -->
+            <input type="text" 
+                   id="messageInput" 
+                   class="chat-input"
+                   placeholder="Type a message..."
+                   onkeypress="handleKeyPress(event)">
+
+            <!-- FILE UPLOAD -->
+            <input type="file" 
+                   id="fileInput" 
+                   accept=".png,.jpg,.jpeg,.gif,.webp,.pdf,.doc,.docx" 
+                   hidden>
+            <button type="button" 
+                    class="chat-emoji-btn"
+                    onclick="document.getElementById('fileInput').click()"
+                    title="Send file">
+                📎
+            </button>
+
+            <!-- SEND BUTTON -->
+            <button type="button" 
+                    class="btn"
+                    onclick="sendMessage()"
+                    style="border-radius: 50%; width: 40px; height: 40px; padding: 0;">
+                ➤
+            </button>
+        </div>
+
+    </div>
+
+</div>
+
+<!-- HIDDEN DATA -->
+<input type="hidden" id="chatData" 
+       data-room="chat_{{ [current_user.id, friend.id] | sort | join('_') }}"
+       data-friend-id="{{ friend.id }}"
+       data-current-user="{{ current_user.id }}">
+
+<script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+<script src="{{ url_for('static', filename='js/chat.js') }}"></script>
+
+<script>
+    const socket = io();
+    const messagesContainer = document.getElementById('messagesContainer');
+    const chatData = document.getElementById('chatData');
+    const room = chatData.dataset.room;
+    const friendId = parseInt(chatData.dataset.friendId);
+    const currentUserId = parseInt(chatData.dataset.currentUser);
+
+    socket.emit('join_chat', { room: room });
+
+    socket.on('receive_message', (data) => {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message ${data.sender_id === currentUserId ? 'sent' : 'received'}`;
+        
+        let content = '<div class="message-content">';
+        
+        if (data.text) {
+            content += `<div class="message-text">${escapeHtml(data.text)}</div>`;
+        }
+        
+        if (data.image) {
+            content += `<div class="message-image"><img src="/static/uploads/chat/${data.image}" alt="Image" onerror="this.src='/static/images/error.png'"></div>`;
+        }
+        
+        if (data.document) {
+            content += `<a href="/static/uploads/chat/${data.document}" class="message-text">📄 ${data.document}</a>`;
+        }
+        
+        content += `<div class="message-time">${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</div>`;
+        content += '</div>';
+        
+        messageDiv.innerHTML = content;
+        messagesContainer.appendChild(messageDiv);
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    });
+
+    function sendMessage() {
+        const input = document.getElementById('messageInput');
+        const text = input.value.trim();
+        
+        if (!text) return;
+
+        socket.emit('send_message', {
+            room: room,
+            text: text,
+            receiver_id: friendId
+        });
+        
+        input.value = '';
+        input.focus();
+    }
+
+    function handleKeyPress(e) {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            sendMessage();
+        }
+    }
+
+    function insertEmoji(emoji) {
+        const input = document.getElementById('messageInput');
+        input.value += emoji;
+        input.focus();
+        toggleEmojiPicker();
+    }
+
+    function toggleEmojiPicker() {
+        const picker = document.getElementById('emojiPicker');
+        picker.classList.toggle('active');
+    }
+
+    function escapeHtml(text) {
+        const map = {
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#039;'
+        };
+        return text.replace(/[&<>"']/g, m => map[m]);
+    }
+
+    document.getElementById('fileInput').addEventListener('change', async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const formData = new FormData();
+        formData.append('file', file);
+
+        try {
+            const response = await fetch('/api/upload-chat-file', {
+                method: 'POST',
+                body: formData
+            });
+
+            const data = await response.json();
+            
+            if (data.success) {
+                socket.emit('send_message', {
+                    room: room,
+                    receiver_id: friendId,
+                    image: data.filename
+                });
+            }
+        } catch (error) {
+            console.error('Upload error:', error);
+        }
+    });
+</script>
+{% endblock %}

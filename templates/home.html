@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block title %}Home - OPENWORLD{% endblock %}
+
+{% block content %}
+<div style="max-width: 1200px; margin: 0 auto;">
+
+    <!-- WELCOME SECTION -->
+    <div class="card" style="text-align: center; padding: 60px 40px; margin-bottom: 40px; background: #000000; border: 1px solid var(--border-primary); color: white;">
+        <h1 style="font-size: 44px; font-weight: 900; margin-bottom: 16px;">
+            Welcome back, {{ user.full_name or user.username }}!
+        </h1>
+        <p style="font-size: 16px; opacity: 0.95; margin-bottom: 30px;">
+            Ready to connect with people around the world?
+        </p>
+
+        <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+            <a href="{{ url_for('match.match_page') }}" class="btn btn-success"
+               style="padding: 14px 28px; background: #FFFFFF; color: #000000; font-weight: 700;">
+                Start Video Chat
+            </a>
+            <a href="{{ url_for('chat.friends_list') }}" class="btn"
+               style="padding: 14px 28px; background: transparent; color: white; border: 2px solid white;">
+                View Messages
+            </a>
+            <a href="{{ url_for('profile.my_profile') }}" class="btn btn-secondary"
+               style="padding: 14px 28px; border: 2px solid white;">
+                My Profile
+            </a>
+        </div>
+    </div>
+
+    <!-- QUICK STATS -->
+    <div class="grid-3col" style="margin-bottom: 40px;">
+
+        <!-- Friends -->
+        <div class="card" style="text-align: center;">
+            <div style="font-size: 40px; margin-bottom: 16px;">👥</div>
+            <h3 style="font-size: 32px; color: #FFFFFF;">
+                {{ user.friends.count() }}
+            </h3>
+            <p style="opacity: 0.8;">Friends</p>
+            <a href="{{ url_for('chat.friends_list') }}" class="btn btn-secondary"
+               style="width: 100%;">
+                View Friends
+            </a>
+        </div>
+
+        <!-- Messages -->
+        <div class="card" style="text-align: center;">
+            <div style="font-size: 40px; margin-bottom: 16px;">💬</div>
+            <h3 style="font-size: 32px; color: #FFFFFF;">
+                {{ user.received_messages.count() }}
+            </h3>
+            <p style="opacity: 0.8;">Messages</p>
+            <a href="{{ url_for('chat.friends_list') }}" class="btn btn-secondary"
+               style="width: 100%;">
+                Check Messages
+            </a>
+        </div>
+
+        <!-- USERS ONLINE (REALTIME) -->
+        <div class="card" style="text-align: center;">
+            <div style="font-size: 40px; margin-bottom: 16px;">🌍</div>
+            <h3 id="onlineUsers" style="font-size: 32px; color: #FFFFFF;">0</h3>
+            <p style="opacity: 0.8;">Users Online</p>
+            <a href="{{ url_for('match.match_page') }}" class="btn btn-success"
+               style="width: 100%; background: #FFFFFF; color: #000000;">
+                Find Match
+            </a>
+        </div>
+
+    </div>
+</div>
+
+<!-- REALTIME USERS ONLINE -->
+<script>
+    if (window.Socket) {
+        Socket.on("users_online", (data) => {
+            const el = document.getElementById("onlineUsers");
+            if (el) el.textContent = data.count;
+        });
+    }
+</script>
+{% endblock %}

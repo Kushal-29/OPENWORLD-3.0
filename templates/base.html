@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Connect with people worldwide through video chat and messaging.">
+    <title>{% block title %}OPENWORLD{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    {% block extra_css %}{% endblock %}
+</head>
+
+<body>
+
+{% if current_user.is_authenticated %}
+<nav class="navbar">
+    <a href="{{ url_for('home') }}" class="navbar-brand">OPENWORLD</a>
+
+    <!-- HAMBURGER MENU BUTTON (Mobile Only) -->
+    <button class="navbar-toggle" id="navbarToggle" onclick="toggleMobileMenu()">
+        <span>☰</span>
+    </button>
+
+    <!-- NAVIGATION LINKS -->
+    <div class="navbar-links" id="navbarLinks">
+        <a href="{{ url_for('home') }}">Home</a>
+        <a href="{{ url_for('match.match_page') }}">Video Chat</a>
+        <a href="{{ url_for('chat.friends_list') }}">Messages</a>
+        
+        <a href="{{ url_for('friend_requests.requests_ui') }}">
+            Requests
+            {% set pending = current_user.received_requests.filter_by(status='pending').count() %}
+            {% if pending > 0 %}
+                <span class="badge" style="background: #DC2626; padding: 2px 6px; border-radius: 4px; font-size: 12px;">({{ pending }})</span>
+            {% endif %}
+        </a>
+
+        <a href="{{ url_for('profile.my_profile') }}">Profile</a>
+        <a href="{{ url_for('auth.logout') }}" class="logout">Logout</a>
+    </div>
+</nav>
+{% endif %}
+
+<main>
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">
+                    <span>{{ message }}</span>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    {% block content %}{% endblock %}
+</main>
+
+<!-- ========================================
+     SCRIPT LOADING ORDER IS CRITICAL!
+     ======================================== -->
+
+<!-- 1. Socket.IO library (needed by socket.js) -->
+<script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+
+<!-- 2. Socket initialization (creates window.Socket) -->
+<script src="{{ url_for('static', filename='js/socket.js') }}"></script>
+
+<!-- 3. Notification system (uses window.Socket) -->
+<script src="{{ url_for('static', filename='js/notification.js') }}"></script>
+
+<!-- 4. UI utilities -->
+<script src="{{ url_for('static', filename='js/ui.js') }}"></script>
+
+<!-- User Data for JS -->
+<div id="userData"
+     data-user-id="{% if current_user.is_authenticated %}{{ current_user.id }}{% endif %}"
+     data-username="{% if current_user.is_authenticated %}{{ current_user.username }}{% endif %}"
+     data-authenticated="{% if current_user.is_authenticated %}true{% else %}false{% endif %}"
+     style="display:none;">
+</div>
+
+<!-- Mobile Menu Toggle Script -->
+<script>
+function toggleMobileMenu() {
+    const navbarLinks = document.getElementById('navbarLinks');
+    navbarLinks.classList.toggle('mobile-open');
+}
+
+// Close menu when clicking on a link
+document.querySelectorAll('.navbar-links a').forEach(link => {
+    link.addEventListener('click', () => {
+        document.getElementById('navbarLinks').classList.remove('mobile-open');
+    });
+});
+
+// Close menu when clicking outside
+document.addEventListener('click', (e) => {
+    const navbar = document.querySelector('.navbar');
+    const navbarLinks = document.getElementById('navbarLinks');
+    const navbarToggle = document.getElementById('navbarToggle');
+    
+    if (navbar && !navbar.contains(e.target)) {
+        navbarLinks.classList.remove('mobile-open');
+    }
+});
+</script>
+
+<!-- Extra JS from pages -->
+{% block extra_js %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,516 @@
+═══════════════════════════════════════════════════════════════════════════════
+🗄️ POSTGRESQL DATABASE SETUP FOR OPENWORLD
+═══════════════════════════════════════════════════════════════════════════════
+
+STEP 1: INSTALL POSTGRESQL
+═══════════════════════════════════════════════════════════════════════════════
+
+WINDOWS:
+1. Download from: https://www.postgresql.org/download/windows/
+2. Run installer
+3. Choose password for postgres user (remember it!)
+4. Choose port 5432 (default)
+5. Complete installation
+
+MAC:
+1. Install Homebrew if not already installed:
+   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+2. Install PostgreSQL:
+   brew install postgresql@15
+
+3. Start PostgreSQL:
+   brew services start postgresql@15
+
+LINUX (Ubuntu/Debian):
+sudo apt-get update
+sudo apt-get install postgresql postgresql-contrib
+
+═══════════════════════════════════════════════════════════════════════════════
+
+STEP 2: OPEN POSTGRESQL COMMAND LINE
+═══════════════════════════════════════════════════════════════════════════════
+
+WINDOWS:
+1. Open Command Prompt
+2. Type: psql -U postgres
+3. Enter the password you set during installation
+
+MAC/LINUX:
+1. Open Terminal
+2. Type: psql postgres
+
+═══════════════════════════════════════════════════════════════════════════════
+
+STEP 3: CREATE USER AND DATABASE
+═══════════════════════════════════════════════════════════════════════════════
+
+Copy-paste ALL of these commands (one by one or all together):
+
+CREATE USER openworld_user WITH PASSWORD 'MyPassword123!';
+
+CREATE DATABASE openworld_db OWNER openworld_user;
+
+ALTER ROLE openworld_user SET client_encoding TO 'utf8';
+
+GRANT ALL PRIVILEGES ON DATABASE openworld_db TO openworld_user;
+
+\c openworld_db
+
+GRANT ALL ON SCHEMA public TO openworld_user;
+
+\q
+
+═══════════════════════════════════════════════════════════════════════════════
+
+EXPLANATION OF EACH COMMAND
+═══════════════════════════════════════════════════════════════════════════════
+
+1. CREATE USER openworld_user WITH PASSWORD 'MyPassword123!';
+   - Creates a new user named "openworld_user"
+   - Password is "MyPassword123!"
+   - Save this! You'll need it in .env file
+
+2. CREATE DATABASE openworld_db OWNER openworld_user;
+   - Creates a new database called "openworld_db"
+   - Sets "openworld_user" as the owner
+
+3. ALTER ROLE openworld_user SET client_encoding TO 'utf8';
+   - Sets character encoding to UTF-8 (for special characters)
+
+4. GRANT ALL PRIVILEGES ON DATABASE openworld_db TO openworld_user;
+   - Gives all permissions to the user for the database
+   - Allows creating tables, inserting data, etc.
+
+5. \c openworld_db
+   - Switches to the openworld_db database
+   - (You should see "You are now connected to database "openworld_db"")
+
+6. GRANT ALL ON SCHEMA public TO openworld_user;
+   - Grants schema permissions
+   - Needed for table creation
+
+7. \q
+   - Exit PostgreSQL prompt
+
+═══════════════════════════════════════════════════════════════════════════════
+
+VERIFY SETUP
+═══════════════════════════════════════════════════════════════════════════════
+
+To verify everything is working:
+
+1. Open PostgreSQL again:
+   psql -U postgres
+
+2. List all databases:
+   \l
+
+3. You should see "openworld_db" in the list
+
+4. Connect to the database:
+   \c openworld_db
+
+5. List tables:
+   \dt
+
+6. You should see empty result (no tables yet - Flask will create them)
+
+7. Exit:
+   \q
+
+═══════════════════════════════════════════════════════════════════════════════
+
+COMPLETE COMMANDS TO COPY-PASTE (ALL AT ONCE)
+═══════════════════════════════════════════════════════════════════════════════
+
+psql -U postgres
+
+CREATE USER openworld_user WITH PASSWORD 'MyPassword123!';
+CREATE DATABASE openworld_db OWNER openworld_user;
+ALTER ROLE openworld_user SET client_encoding TO 'utf8';
+GRANT ALL PRIVILEGES ON DATABASE openworld_db TO openworld_user;
+\c openworld_db
+GRANT ALL ON SCHEMA public TO openworld_user;
+\q
+
+═══════════════════════════════════════════════════════════════════════════════
+
+WHAT HAPPENS NEXT
+═══════════════════════════════════════════════════════════════════════════════
+
+When you run your Flask app (python app.py), it will:
+
+1. Connect to PostgreSQL using credentials from .env file
+2. Create all necessary tables automatically:
+   - user table (user accounts)
+   - message table (chat messages)
+   - friend_request table (friend requests)
+   - friends_association table (friend relationships)
+3. Create indexes for better performance
+4. Create foreign key relationships
+
+You don't need to create tables manually - Flask SQLAlchemy does it!
+
+═══════════════════════════════════════════════════════════════════════════════
+
+EDIT YOUR .env FILE
+═══════════════════════════════════════════════════════════════════════════════
+
+After creating the database, edit your .env file:
+
+FLASK_ENV=development
+FLASK_DEBUG=True
+SECRET_KEY=dev-secret-key-12345
+
+DB_USER=openworld_user
+DB_PASSWORD=MyPassword123!
+DB_HOST=localhost
+DB_PORT=5432
+DB_NAME=openworld_db
+
+These values must match what you created in PostgreSQL!
+
+═══════════════════════════════════════════════════════════════════════════════
+
+DATABASE STRUCTURE (AUTOMATICALLY CREATED)
+═══════════════════════════════════════════════════════════════════════════════
+
+TABLE 1: user
+┌─────────────────┬──────────────────────┐
+│ Column          │ Type                 │
+├─────────────────┼──────────────────────┤
+│ id              │ INTEGER (Primary Key)│
+│ username        │ VARCHAR (50, unique) │
+│ email           │ VARCHAR (120, unique)│
+│ password        │ VARCHAR (300)        │
+│ full_name       │ VARCHAR (100)        │
+│ age             │ INTEGER              │
+│ country         │ VARCHAR (100)        │
+│ bio             │ TEXT                 │
+│ profile_pic     │ VARCHAR (200)        │
+│ created_at      │ DATETIME             │
+│ last_seen       │ DATETIME             │
+│ is_active       │ BOOLEAN              │
+└─────────────────┴──────────────────────┘
+
+TABLE 2: message
+┌─────────────────┬──────────────────────┐
+│ Column          │ Type                 │
+├─────────────────┼──────────────────────┤
+│ id              │ INTEGER (Primary Key)│
+│ sender_id       │ INTEGER (FK: user)   │
+│ receiver_id     │ INTEGER (FK: user)   │
+│ text            │ TEXT                 │
+│ image           │ VARCHAR (200)        │
+│ document        │ VARCHAR (200)        │
+│ is_read         │ BOOLEAN              │
+│ created_at      │ DATETIME             │
+└─────────────────┴──────────────────────┘
+
+TABLE 3: friend_request
+┌─────────────────┬──────────────────────┐
+│ Column          │ Type                 │
+├─────────────────┼──────────────────────┤
+│ id              │ INTEGER (Primary Key)│
+│ sender_id       │ INTEGER (FK: user)   │
+│ receiver_id     │ INTEGER (FK: user)   │
+│ status          │ VARCHAR (20)         │
+│ created_at      │ DATETIME             │
+└─────────────────┴──────────────────────┘
+
+TABLE 4: friends_association (Many-to-Many)
+┌─────────────────┬──────────────────────┐
+│ Column          │ Type                 │
+├─────────────────┼──────────────────────┤
+│ user_id         │ INTEGER (FK: user)   │
+│ friend_id       │ INTEGER (FK: user)   │
+└─────────────────┴──────────────────────┘
+
+═══════════════════════════════════════════════════════════════════════════════
+
+USEFULL POSTGRESQL COMMANDS
+═══════════════════════════════════════════════════════════════════════════════
+
+# List all databases
+\l
+
+# Connect to a database
+\c database_name
+
+# List all tables in current database
+\dt
+
+# Describe a table structure
+\d table_name
+
+# List all users
+\du
+
+# View all data in a table
+SELECT * FROM table_name;
+
+# Count rows in a table
+SELECT COUNT(*) FROM table_name;
+
+# Delete a database (careful!)
+DROP DATABASE database_name;
+
+# Exit PostgreSQL
+\q
+
+═══════════════════════════════════════════════════════════════════════════════
+
+TROUBLESHOOTING
+═══════════════════════════════════════════════════════════════════════════════
+
+PROBLEM: "psql: command not found"
+SOLUTION:
+- Windows: Add PostgreSQL to PATH or use full path:
+  "C:\Program Files\PostgreSQL\15\bin\psql" -U postgres
+
+- Mac: brew install postgresql@15
+  Then: brew services start postgresql@15
+
+- Linux: sudo apt-get install postgresql
+
+PROBLEM: "password authentication failed"
+SOLUTION:
+- Make sure you're using correct password
+- Reset password if needed:
+  psql -U postgres
+  ALTER USER openworld_user WITH PASSWORD 'NewPassword123!';
+
+PROBLEM: "database openworld_db does not exist"
+SOLUTION:
+- Database wasn't created
+- Follow Step 3 again to create it
+
+PROBLEM: "could not connect to server"
+SOLUTION:
+- PostgreSQL is not running
+- Windows: Start PostgreSQL service from Services
+- Mac: brew services start postgresql@15
+- Linux: sudo service postgresql start
+
+PROBLEM: "role openworld_user does not exist"
+SOLUTION:
+- User wasn't created
+- Follow Step 3 again to create the user
+
+═══════════════════════════════════════════════════════════════════════════════
+
+QUICK REFERENCE
+═══════════════════════════════════════════════════════════════════════════════
+
+DATABASE NAME: openworld_db
+DATABASE USER: openworld_user
+DATABASE PASSWORD: MyPassword123!
+DATABASE HOST: localhost
+DATABASE PORT: 5432
+
+Connection String: postgresql+psycopg2://openworld_user:MyPassword123!@localhost:5432/openworld_db
+
+═══════════════════════════════════════════════════════════════════════════════
+
+NEXT STEPS
+═══════════════════════════════════════════════════════════════════════════════
+
+1. ✅ Create PostgreSQL database (THIS GUIDE)
+2. ✅ Edit .env file with credentials
+3. ✅ Download all Python files
+4. ✅ Create virtual environment
+5. ✅ Install dependencies (pip install -r requirements.txt)
+6. ✅ Run Flask app (python app.py)
+7. ✅ Flask will create all tables automatically
+8. ✅ Open http://localhost:5000
+
+═══════════════════════════════════════════════════════════════════════════════
+
+YOU'RE READY!
+
+The database is set up and waiting for Flask to create the tables.
+Run your app and it will work perfectly! 🚀
+
+═══════════════════════════════════════════════════════════════════════════════
+
+
+CMD WHICH I PERFORMED :-- 
+
+SELECT datname, pg_catalog.pg_get_userbyid(datdba) AS owner
+FROM pg_database
+WHERE datname = 'openworld_db';
+
+CREATE TABLE users (
+    id SERIAL PRIMARY KEY,
+    username VARCHAR(50) UNIQUE NOT NULL,
+    email VARCHAR(120) UNIQUE NOT NULL,
+    password VARCHAR(300) NOT NULL,
+    full_name VARCHAR(100),
+    age INTEGER,
+    country VARCHAR(100),
+    bio TEXT,
+    profile_pic VARCHAR(200),
+    is_active BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    last_seen TIMESTAMP
+);
+
+CREATE TABLE messages (
+    id SERIAL PRIMARY KEY,
+    sender_id INTEGER NOT NULL,
+    receiver_id INTEGER NOT NULL,
+    text TEXT,
+    image VARCHAR(200),
+    document VARCHAR(200),
+    is_read BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT fk_sender
+        FOREIGN KEY (sender_id)
+        REFERENCES users(id)
+        ON DELETE CASCADE,
+
+    CONSTRAINT fk_receiver
+        FOREIGN KEY (receiver_id)
+        REFERENCES users(id)
+        ON DELETE CASCADE
+);
+
+CREATE TABLE friend_requests (
+    id SERIAL PRIMARY KEY,
+    sender_id INTEGER NOT NULL,
+    receiver_id INTEGER NOT NULL,
+    status VARCHAR(20) DEFAULT 'pending',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT fk_fr_sender
+        FOREIGN KEY (sender_id)
+        REFERENCES users(id)
+        ON DELETE CASCADE,
+
+    CONSTRAINT fk_fr_receiver
+        FOREIGN KEY (receiver_id)
+        REFERENCES users(id)
+        ON DELETE CASCADE
+);
+
+CREATE TABLE friends_association (
+    user_id INTEGER NOT NULL,
+    friend_id INTEGER NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    PRIMARY KEY (user_id, friend_id),
+
+    CONSTRAINT fk_user
+        FOREIGN KEY (user_id)
+        REFERENCES users(id)
+        ON DELETE CASCADE,
+
+    CONSTRAINT fk_friend
+        FOREIGN KEY (friend_id)
+        REFERENCES users(id)
+        ON DELETE CASCADE
+);
+
+CREATE INDEX idx_messages_sender ON messages(sender_id);
+CREATE INDEX idx_messages_receiver ON messages(receiver_id);
+CREATE INDEX idx_friend_requests_sender ON friend_requests(sender_id);
+CREATE INDEX idx_friend_requests_receiver ON friend_requests(receiver_id);
+
+CREATE ROLE openworld_user
+WITH
+LOGIN
+PASSWORD 'MyPassword123!';
+
+ALTER ROLE openworld_user CREATEDB;
+
+GRANT ALL PRIVILEGES ON DATABASE openworld_db TO openworld_user;
+GRANT ALL ON SCHEMA public TO openworld_user;
+ALTER ROLE openworld_user SET client_encoding TO 'utf8';
+
+-- Give full access on ALL tables
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO openworld_user;
+
+-- Give access on sequences (SERIAL / auto-increment fix)
+GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO openworld_user;
+
+-- Ensure future tables are accessible too
+ALTER DEFAULT PRIVILEGES IN SCHEMA public
+GRANT ALL ON TABLES TO openworld_user;
+
+ALTER DEFAULT PRIVILEGES IN SCHEMA public
+GRANT ALL ON SEQUENCES TO openworld_user;
+
+
+CHANGESSSSS
+
+
+-- ADD MISSING COLUMNS TO USERS TABLE
+ALTER TABLE users ADD COLUMN IF NOT EXISTS gender VARCHAR(20);
+ALTER TABLE users ADD COLUMN IF NOT EXISTS city VARCHAR(100);
+ALTER TABLE users ADD COLUMN IF NOT EXISTS interests TEXT;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS reputation_score FLOAT DEFAULT 5.0;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS is_online BOOLEAN DEFAULT FALSE;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS socket_id VARCHAR(100);
+
+-- CREATE MATCH_QUEUE TABLE
+CREATE TABLE IF NOT EXISTS match_queue (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER NOT NULL,
+    status VARCHAR(20) DEFAULT 'waiting',
+    preferred_gender VARCHAR(20) DEFAULT 'any',
+    min_age INTEGER DEFAULT 13,
+    max_age INTEGER DEFAULT 100,
+    preferred_countries TEXT,
+    socket_id VARCHAR(100),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    timeout_at TIMESTAMP,
+    CONSTRAINT fk_match_queue_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+CREATE INDEX IF NOT EXISTS idx_match_queue_user ON match_queue(user_id);
+CREATE INDEX IF NOT EXISTS idx_match_queue_status ON match_queue(status);
+
+-- CREATE ACTIVE_MATCHES TABLE
+CREATE TABLE IF NOT EXISTS active_matches (
+    id SERIAL PRIMARY KEY,
+    room_id VARCHAR(100) UNIQUE NOT NULL,
+    user1_id INTEGER NOT NULL,
+    user2_id INTEGER NOT NULL,
+    status VARCHAR(20) DEFAULT 'active',
+    started_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    ended_at TIMESTAMP,
+    CONSTRAINT fk_active_matches_user1 FOREIGN KEY (user1_id) REFERENCES users(id) ON DELETE CASCADE,
+    CONSTRAINT fk_active_matches_user2 FOREIGN KEY (user2_id) REFERENCES users(id) ON DELETE CASCADE
+);
+CREATE INDEX IF NOT EXISTS idx_active_matches_room ON active_matches(room_id);
+CREATE INDEX IF NOT EXISTS idx_active_matches_status ON active_matches(status);
+
+-- CREATE MATCH_HISTORY TABLE
+CREATE TABLE IF NOT EXISTS match_history (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER NOT NULL,
+    matched_user_id INTEGER NOT NULL,
+    room_id VARCHAR(100),
+    duration_seconds INTEGER DEFAULT 0,
+    matched_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_match_history_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    CONSTRAINT fk_match_history_matched FOREIGN KEY (matched_user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+CREATE INDEX IF NOT EXISTS idx_match_history_user ON match_history(user_id);
+
+-- CREATE BLOCKED_ASSOCIATION TABLE
+CREATE TABLE IF NOT EXISTS blocked_association (
+    user_id INTEGER NOT NULL,
+    blocked_user_id INTEGER NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (user_id, blocked_user_id),
+    CONSTRAINT fk_blocked_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    CONSTRAINT fk_blocked_blocked_user FOREIGN KEY (blocked_user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+CREATE INDEX IF NOT EXISTS idx_blocked_association_user ON blocked_association(user_id);
+
+-- CREATE INDEXES ON USERS TABLE
+CREATE INDEX IF NOT EXISTS idx_users_username ON users(username);
+CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
+CREATE INDEX IF NOT EXISTS idx_users_is_active ON users(is_active);
