@@ -38,6 +38,15 @@ def get_local_ip():
 # ======================
 app = Flask(__name__)
 app.config.from_object(config)
+# ======================
+# DATABASE CONFIG (Railway / Supabase safe)
+# ======================
+DATABASE_URL = os.getenv("DATABASE_URL")
+
+if DATABASE_URL:
+    app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URL
+else:
+    app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///app.db"
 
 app.logger.addHandler(file_handler)
 app.logger.setLevel(logging.DEBUG)
@@ -91,9 +100,7 @@ except Exception as e:
 # ======================
 # DB INIT
 # ======================
-with app.app_context():
-    db.create_all()
-    app.logger.info("✅ Database initialized")
+
 
 # ======================
 # SOCKET EVENTS
