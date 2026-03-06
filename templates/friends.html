@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+
+{% block title %}Messages - OPENWORLD{% endblock %}
+
+{% block content %}
+<div style="display: grid; grid-template-columns: 300px 1fr; gap: 0; height: calc(100vh - 120px); background: var(--bg-primary); border: 1px solid var(--border-primary); border-radius: 16px; overflow: hidden;" data-friends-list>
+    
+    <!-- LEFT SIDEBAR - FRIENDS LIST -->
+    <div style="border-right: 1px solid var(--border-primary); background: var(--bg-primary); overflow-y: auto; display: flex; flex-direction: column;">
+        
+        <div style="padding: 16px; border-bottom: 1px solid var(--border-primary); position: sticky; top: 0; background: var(--bg-primary);">
+            <h2 style="font-size: 18px; font-weight: 700; margin: 0;">Messages</h2>
+            <p style="font-size: 12px; color: var(--text-secondary); margin: 6px 0 0 0;">
+                {% if conversations|length > 0 %}
+                    {{ conversations|length }} conversation{{ 's' if conversations|length != 1 else '' }}
+                {% else %}
+                    No conversations yet
+                {% endif %}
+            </p>
+        </div>
+
+        {% if conversations %}
+            {% for convo in conversations %}
+            <a href="{{ url_for('chat.chat_window', user_id=convo.friend.id) }}"
+               data-conversation-id="{{ convo.friend.id }}"
+               style="display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-bottom: 1px solid var(--border-primary); cursor: pointer; text-decoration: none; color: var(--text-primary); transition: background-color 0.2s ease;"
+               onmouseover="this.style.backgroundColor='var(--bg-secondary)'"
+               onmouseout="this.style.backgroundColor='transparent'">
+                
+                <img src="/static/uploads/profiles/{{ convo.friend.profile_pic }}"
+                     style="width: 48px; height: 48px; border-radius: 50%; object-fit: cover; flex-shrink: 0; border: 2px solid var(--border-primary);"
+                     onerror="this.src='/static/uploads/profiles/default.png'"
+                     alt="{{ convo.friend.username }}">
+
+                <div style="flex: 1; min-width: 0; display: flex; flex-direction: column;">
+                    <div style="font-weight: 600; font-size: 14px; color: var(--text-primary);">
+                        {{ convo.friend.full_name or convo.friend.username }}
+                    </div>
+                    <div style="color: var(--text-secondary); font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                        {% if convo.last_msg %}
+                            <span class="{% if convo.unread > 0 %}unread-text{% endif %}"></span>
+                                {% if convo.last_msg.sender_id == user.id %}You: {% endif %}
+                                {{ convo.last_msg.text[:35] if convo.last_msg.text else '📎 Shared file' }}{% if convo.last_msg.text and convo.last_msg.text|length > 35 %}...{% endif %}
+                            </span>
+                        {% else %}
+                            <span style="color: var(--text-secondary);">No messages yet</span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                {% if convo.unread > 0 %}
+                    <div style="background: linear-gradient(135deg, #6366f1, #3b82f6); color: #FFFFFF;
+                                min-width: 28px; height: 28px;
+                                border-radius: 50%;
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                                font-size: 12px; font-weight: 700; flex-shrink: 0; box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);">
+                        {{ convo.unread }}
+                    </div>
+                {% endif %}
+            </a>
+            {% endfor %}
+        {% else %}
+            <div style="padding: 16px; color: var(--text-secondary); text-align: center; font-size: 14px; display: flex; align-items: center; justify-content: center; flex: 1; flex-direction: column;">
+                <div style="font-size: 48px; margin-bottom: 12px;">👥</div>
+                <div style="font-weight: 500;">No conversations yet</div>
+                <div style="font-size: 12px; margin-top: 8px;">Send a message to a friend to start chatting</div>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- RIGHT SIDE - WELCOME MESSAGE OR CHAT -->
+    <div style="display: flex; align-items: center; justify-content: center; background: var(--bg-primary); background-image: radial-gradient(circle at 20% 50%, rgba(99, 102, 241, 0.05) 0%, transparent 50%), radial-gradient(circle at 80% 80%, rgba(59, 130, 246, 0.05) 0%, transparent 50%);">
+        <div style="text-align: center;">
+            <div style="font-size: 64px; margin-bottom: 16px; animation: bounce 2s infinite;">💬</div>
+            <h2 style="font-size: 24px; font-weight: 700; margin-bottom: 8px; color: var(--text-primary);">Select a conversation</h2>
+            <p style="color: var(--text-secondary); font-size: 14px;">Choose a friend from the list to start or continue chatting</p>
+        </div>
+    </div>
+
+</div>
+
+<audio id="notificationSound" style="display: none;">
+    <source src="/static/sounds/notification.mp3" type="audio/mpeg">
+</audio>
+
+<style>
+    @keyframes bounce {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-10px); }
+    }
+
+    @media (max-width: 768px) {
+        main > div {
+            grid-template-columns: 1fr !important;
+        }
+        
+        main > div > div:last-child {
+            display: none;
+        }
+        
+        main > div > div:first-child {
+            max-height: 100%;
+        }
+    }
+
+    [data-conversation-id]:hover {
+        background-color: var(--bg-secondary) !important;
+    }
+    .unread-text {
+        font-weight: 600;
+        color: var(--text-primary);
+    }
+</style>
+{% endblock %}

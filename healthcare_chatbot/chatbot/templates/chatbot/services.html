@@ -1,0 +1,426 @@
+{% extends 'chatbot/base.html' %}
+{% block title %}Services – Healthcare Chatbot{% endblock %}
+
+{% block extra_css %}
+.page-hero {
+    background: linear-gradient(135deg, #1a73e8 0%, #0d47a1 100%);
+    color: #fff;
+    padding: 50px 0;
+}
+
+.page-hero h2 { font-size: 2rem; font-weight: 700; }
+
+.service-card {
+    background: #fff;
+    border-radius: 16px;
+    padding: 32px 24px;
+    text-align: center;
+    box-shadow: 0 4px 20px rgba(26,115,232,0.1);
+    transition: all 0.3s;
+    height: 100%;
+    border-top: 4px solid transparent;
+}
+
+.service-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 12px 35px rgba(26,115,232,0.2);
+    border-top-color: #1a73e8;
+}
+
+.service-icon {
+    width: 80px;
+    height: 80px;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+    font-size: 2rem;
+}
+
+.service-card h5 { font-weight: 700; color: #1a1a2e; margin-bottom: 10px; }
+.service-card p { font-size: 0.88rem; color: #6b7280; }
+
+.appointment-form {
+    background: #fff;
+    border-radius: 20px;
+    padding: 40px;
+    box-shadow: 0 4px 30px rgba(26,115,232,0.12);
+}
+
+.form-label {
+    font-weight: 600;
+    font-size: 0.88rem;
+    color: #1a1a2e;
+    margin-bottom: 8px;
+    display: block;
+}
+
+.form-control, .form-select {
+    border: 1.5px solid #e5edf9;
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 0.9rem;
+    transition: all 0.25s;
+    background: #f9fbfd;
+}
+
+.form-control:focus, .form-select:focus {
+    background: #fff;
+    border-color: #1a73e8;
+    box-shadow: 0 0 0 3px rgba(26,115,232,0.1);
+    color: #1a1a2e;
+}
+
+.form-control::placeholder {
+    color: #9ca3af;
+}
+
+textarea.form-control {
+    resize: vertical;
+    min-height: 120px;
+    font-family: 'Poppins', sans-serif;
+}
+
+.btn-submit {
+    background: linear-gradient(135deg, #1a73e8 0%, #0d47a1 100%);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    padding: 12px 36px;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.25s;
+    box-shadow: 0 4px 15px rgba(26,115,232,0.3);
+}
+
+.btn-submit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(26,115,232,0.4);
+}
+
+.btn-submit:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.success-message {
+    display: none;
+    padding: 16px;
+    background: #e7f5e7;
+    border: 1.5px solid #22c55e;
+    border-radius: 8px;
+    color: #16a34a;
+    margin-bottom: 20px;
+    text-align: center;
+    font-weight: 600;
+}
+
+.success-message.show {
+    display: block;
+}
+
+.error-message {
+    display: none;
+    padding: 16px;
+    background: #fde8e8;
+    border: 1.5px solid #ef4444;
+    border-radius: 8px;
+    color: #991b1b;
+    margin-bottom: 20px;
+    text-align: center;
+    font-weight: 600;
+}
+
+.error-message.show {
+    display: block;
+}
+
+.loading-spinner {
+    display: none;
+    text-align: center;
+}
+
+.loading-spinner.show {
+    display: block;
+}
+
+.spinner-icon {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(26,115,232,0.3);
+    border-top-color: #1a73e8;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #1a73e8 0%, #0d47a1 100%);
+    border: none;
+    font-weight: 600;
+    border-radius: 8px;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(26,115,232,0.3);
+}
+
+.btn-warning, .btn-success, .btn-danger {
+    border: none;
+    font-weight: 600;
+}
+
+@media (max-width: 768px) {
+    .appointment-form {
+        padding: 24px;
+    }
+}
+{% endblock %}
+
+{% block content %}
+<section class="page-hero">
+    <div class="container text-center">
+        <h2><i class="fas fa-stethoscope me-3"></i>Our Services</h2>
+        <p style="opacity:0.85;margin-top:10px;">Comprehensive AI-powered healthcare services</p>
+    </div>
+</section>
+
+<div class="container py-5">
+    <div class="row g-4 mb-5">
+        <div class="col-md-4">
+            <div class="service-card">
+                <div class="service-icon" style="background:#e8f0fe;"><i class="fas fa-robot" style="color:#1a73e8;"></i></div>
+                <h5>AI Symptom Checker</h5>
+                <p>Describe your symptoms and get instant AI-powered analysis using our Decision Tree algorithm.</p>
+                <a href="{% url 'chat' %}" class="btn btn-primary mt-3" style="border-radius:8px;font-size:0.88rem;">Chat Now</a>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="service-card">
+                <div class="service-icon" style="background:#fef3e2;"><i class="fas fa-calendar-check" style="color:#f59e0b;"></i></div>
+                <h5>Book Appointment</h5>
+                <p>Schedule consultations with qualified doctors at your preferred time and location.</p>
+                <a href="#appointment-section" class="btn btn-warning mt-3 text-white" style="border-radius:8px;font-size:0.88rem;">Book Now</a>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="service-card">
+                <div class="service-icon" style="background:#e8f5e9;"><i class="fas fa-map-marked-alt" style="color:#43a047;"></i></div>
+                <h5>Nearby Hospitals</h5>
+                <p>Find the nearest hospitals, clinics, and emergency medical facilities on an interactive map.</p>
+                <a href="{% url 'nearby_hospitals' %}" class="btn btn-success mt-3" style="border-radius:8px;font-size:0.88rem;">Find Hospitals</a>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="service-card">
+                <div class="service-icon" style="background:#fce8e6;"><i class="fas fa-brain" style="color:#e53935;"></i></div>
+                <h5>Mental Health Support</h5>
+                <p>Access mental health resources, guided support, and connect with counseling services.</p>
+                <a href="{% url 'chat' %}" class="btn btn-danger mt-3" style="border-radius:8px;font-size:0.88rem;">Get Support</a>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="service-card">
+                <div class="service-icon" style="background:#f3e8ff;"><i class="fas fa-file-medical" style="color:#9c27b0;"></i></div>
+                <h5>Medical Records</h5>
+                <p>Securely store and access your medical history, chat history, and health reports.</p>
+                <a href="{% url 'chat' %}" class="btn mt-3" style="border-radius:8px;font-size:0.88rem;background:#9c27b0;color:#fff;">View Records</a>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="service-card">
+                <div class="service-icon" style="background:#e0f7fa;"><i class="fas fa-pills" style="color:#00bcd4;"></i></div>
+                <h5>Disease Precautions</h5>
+                <p>Get detailed precautions, treatments, and preventive measures for predicted conditions.</p>
+                <a href="{% url 'chat' %}" class="btn mt-3" style="border-radius:8px;font-size:0.88rem;background:#00bcd4;color:#fff;">Learn More</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Appointment Form Section -->
+    <div class="row justify-content-center" id="appointment-section">
+        <div class="col-lg-8">
+            <div class="appointment-form">
+                <h4 style="font-weight:700;color:#1a1a2e;margin-bottom:24px;text-align:center;">
+                    <i class="fas fa-calendar-plus me-2" style="color:#1a73e8;"></i>Book an Appointment
+                </h4>
+
+                <div class="success-message" id="apptSuccess">
+                    <i class="fas fa-check-circle me-2"></i>
+                    <strong>Appointment request submitted successfully!</strong> We'll contact you shortly to confirm your booking.
+                </div>
+
+                <div class="error-message" id="apptError">
+                    <i class="fas fa-exclamation-circle me-2"></i>
+                    <span id="errorText">There was an error submitting your appointment. Please try again.</span>
+                </div>
+
+                <div class="loading-spinner" id="apptLoading">
+                    <div class="spinner-icon"></div>
+                    <p style="color:#6b7280;margin-top:12px;font-size:0.9rem;">Submitting your appointment request...</p>
+                </div>
+
+                <form id="appointmentForm" action="https://formspree.io/f/mvzbvale" method="POST">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Full Name <span style="color:#ef4444;">*</span></label>
+                            <input type="text" name="full_name" class="form-control" placeholder="Your full name" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Phone Number <span style="color:#ef4444;">*</span></label>
+                            <input type="tel" name="phone" class="form-control" placeholder="+91 XXXXX XXXXX" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Email <span style="color:#ef4444;">*</span></label>
+                            <input type="email" name="email" class="form-control" placeholder="your@email.com" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Preferred Date <span style="color:#ef4444;">*</span></label>
+                            <input type="date" name="preferred_date" class="form-control" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Department <span style="color:#ef4444;">*</span></label>
+                            <select name="department" class="form-control" required>
+                                <option value="">Select a department</option>
+                                <option value="General Medicine">General Medicine</option>
+                                <option value="Cardiology">Cardiology</option>
+                                <option value="Orthopedics">Orthopedics</option>
+                                <option value="Pediatrics">Pediatrics</option>
+                                <option value="Neurology">Neurology</option>
+                                <option value="Mental Health">Mental Health</option>
+                                <option value="Dermatology">Dermatology</option>
+                                <option value="Gynecology">Gynecology</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Preferred Time <span style="color:#ef4444;">*</span></label>
+                            <select name="preferred_time" class="form-control" required>
+                                <option value="">Select a time slot</option>
+                                <option value="Morning (9 AM - 12 PM)">Morning (9 AM - 12 PM)</option>
+                                <option value="Afternoon (12 PM - 3 PM)">Afternoon (12 PM - 3 PM)</option>
+                                <option value="Evening (3 PM - 6 PM)">Evening (3 PM - 6 PM)</option>
+                            </select>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Symptoms / Reason <span style="color:#ef4444;">*</span></label>
+                            <textarea name="symptoms" class="form-control" placeholder="Briefly describe your symptoms or reason for appointment..." required></textarea>
+                        </div>
+                        <div class="col-12 text-center">
+                            <input type="hidden" name="_next" value="{% url 'services' %}?appointment=success">
+                            <input type="hidden" name="_captcha" value="false">
+                            <button type="submit" class="btn-submit" id="submitBtn">
+                                <i class="fas fa-calendar-check me-2"></i>Submit Appointment Request
+                            </button>
+                        </div>
+                    </div>
+                </form>
+
+                <!-- Success Message on Page Load -->
+                {% if request.GET.appointment == 'success' %}
+                <script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        const successMsg = document.getElementById('apptSuccess');
+                        successMsg.classList.add('show');
+                        setTimeout(() => {
+                            successMsg.classList.remove('show');
+                        }, 5000);
+                    });
+                </script>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('appointmentForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const successMsg = document.getElementById('apptSuccess');
+    const errorMsg = document.getElementById('apptError');
+    const loading = document.getElementById('apptLoading');
+
+    // Form validation
+    function validateForm() {
+        const fullName = document.querySelector('input[name="full_name"]').value.trim();
+        const phone = document.querySelector('input[name="phone"]').value.trim();
+        const email = document.querySelector('input[name="email"]').value.trim();
+        const date = document.querySelector('input[name="preferred_date"]').value;
+        const dept = document.querySelector('select[name="department"]').value;
+        const time = document.querySelector('select[name="preferred_time"]').value;
+        const symptoms = document.querySelector('textarea[name="symptoms"]').value.trim();
+
+        const isValid = fullName && phone && email && date && dept && time && symptoms;
+        submitBtn.disabled = !isValid;
+    }
+
+    // Validate on input
+    document.querySelectorAll('input, select, textarea').forEach(field => {
+        field.addEventListener('change', validateForm);
+        field.addEventListener('input', validateForm);
+    });
+
+    // Initial validation check
+    validateForm();
+
+    // Form submission handling
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        // Show loading state
+        loading.classList.add('show');
+        submitBtn.disabled = true;
+        successMsg.classList.remove('show');
+        errorMsg.classList.remove('show');
+
+        // Prepare form data
+        const formData = new FormData(form);
+
+        // Submit to Formspree
+        fetch(form.action, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'Accept': 'application/json'
+            }
+        })
+        .then(response => {
+            loading.classList.remove('show');
+            
+            if (response.ok) {
+                // Success
+                successMsg.classList.add('show');
+                form.reset();
+                validateForm();
+                
+                // Hide success message after 5 seconds
+                setTimeout(() => {
+                    successMsg.classList.remove('show');
+                }, 5000);
+            } else {
+                // Error
+                errorMsg.classList.add('show');
+                document.getElementById('errorText').textContent = 'Server error. Please try again later.';
+            }
+        })
+        .catch(error => {
+            loading.classList.remove('show');
+            errorMsg.classList.add('show');
+            document.getElementById('errorText').textContent = 'Network error. Please check your connection and try again.';
+        })
+        .finally(() => {
+            submitBtn.disabled = false;
+        });
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,148 @@
+{% extends "base.html" %}
+
+{% block title %}Sign Up - OPENWORLD{% endblock %}
+
+{% block content %}
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; min-height: calc(100vh - 80px); padding: 40px 0;">
+    
+    <!-- LEFT SIDE - BRANDING -->
+    <div style="padding: 40px; text-align: center;">
+        <h1 style="font-size: 56px; font-weight: 900; margin-bottom: 24px; color: #FFFFFF; letter-spacing: -2px;">
+            OPENWORLD
+        </h1>
+        <p style="font-size: 20px; color: var(--text-primary); line-height: 1.6; margin-bottom: 20px; font-weight: 500;">
+            Join millions of people worldwide
+        </p>
+        <p style="font-size: 15px; color: var(--text-secondary); line-height: 1.6;">
+            Create your account today and start connecting with people from every corner of the globe instantly.
+        </p>
+    </div>
+
+    <!-- RIGHT SIDE - FORM -->
+    <div style="padding: 40px;">
+        <form method="POST" style="background-color: var(--bg-secondary); border: 1px solid var(--border-primary); border-radius: 16px; padding: 32px; max-width: 100%;">
+            <h2 style="margin-bottom: 24px; font-size: 22px; font-weight: 700; letter-spacing: -0.5px;">Create account</h2>
+
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input 
+                    type="text" 
+                    id="username"
+                    name="username" 
+                    placeholder="Choose a username" 
+                    required 
+                    minlength="3"
+                    autofocus>
+                <small>3-50 characters, letters, numbers, underscores</small>
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <input 
+                    type="email" 
+                    id="email"
+                    name="email" 
+                    placeholder="your@email.com" 
+                    required>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <div style="position: relative;">
+                    <input 
+                        type="password" 
+                        id="password"
+                        name="password" 
+                        placeholder="Create a strong password" 
+                        required
+                        minlength="6">
+                    <button 
+                        type="button"
+                        onclick="togglePassword('password')"
+                        style="position: absolute; right: 14px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--text-secondary); cursor: pointer; font-size: 18px; padding: 0; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; transition: color 0.2s ease;"
+                        onmouseover="this.style.color='#FFFFFF'"
+                        onmouseout="this.style.color='var(--text-secondary)'">
+                        👁️
+                    </button>
+                </div>
+                <small>At least 6 characters</small>
+            </div>
+
+            <div class="form-group">
+                <label for="confirm_password">Confirm Password</label>
+                <div style="position: relative;">
+                    <input 
+                        type="password" 
+                        id="confirm_password"
+                        name="confirm_password" 
+                        placeholder="Re-enter your password" 
+                        required>
+                    <button 
+                        type="button"
+                        onclick="togglePassword('confirm_password')"
+                        style="position: absolute; right: 14px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--text-secondary); cursor: pointer; font-size: 18px; padding: 0; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; transition: color 0.2s ease;"
+                        onmouseover="this.style.color='#FFFFFF'"
+                        onmouseout="this.style.color='var(--text-secondary)'">
+                        👁️
+                    </button>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-block" style="padding: 14px; margin-top: 24px; font-size: 15px; font-weight: 700;">
+                Create Account
+            </button>
+
+            <div style="margin-top: 24px; text-align: center; border-top: 1px solid var(--border-primary); padding-top: 24px;">
+                <p style="color: var(--text-secondary); margin-bottom: 12px; font-size: 14px;">
+                    Already have an account?
+                </p>
+                <a href="{{ url_for('auth.login') }}" 
+                   style="color: #FFFFFF; text-decoration: none; font-weight: 700; font-size: 15px; transition: color 0.2s ease;"
+                   onmouseover="this.style.color='#E8E8E8'"
+                   onmouseout="this.style.color='#FFFFFF'">
+                    Log in here
+                </a>
+            </div>
+        </form>
+    </div>
+
+</div>
+
+<script>
+function togglePassword(fieldId) {
+    const input = document.getElementById(fieldId);
+    const btn = event.target;
+    
+    if (input.type === 'password') {
+        input.type = 'text';
+        btn.textContent = '🙈';
+    } else {
+        input.type = 'password';
+        btn.textContent = '👁️';
+    }
+}
+</script>
+
+<style>
+    @media (max-width: 1024px) {
+        main > div {
+            grid-template-columns: 1fr !important;
+            gap: 30px !important;
+        }
+        
+        main > div > div:first-child {
+            display: none;
+        }
+    }
+
+    @media (max-width: 768px) {
+        main > div {
+            padding: 20px !important;
+        }
+
+        main > div > div {
+            padding: 20px !important;
+        }
+    }
+</style>
+{% endblock %}

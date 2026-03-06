@@ -1,0 +1,649 @@
+{% extends 'chatbot/base.html' %}
+
+{% block title %}AI Chat Room – Healthcare Chatbot{% endblock %}
+
+{% block extra_css %}
+.chat-page {
+    background: linear-gradient(135deg, #e8f4fd 0%, #f0f4ff 100%);
+    min-height: calc(100vh - 70px);
+    display: flex;
+    align-items: stretch;
+}
+
+.chat-layout {
+    display: flex;
+    width: 100%;
+    min-height: calc(100vh - 70px);
+}
+
+/* LEFT PANEL - illustration */
+.chat-left {
+    flex: 1;
+    background: linear-gradient(160deg, #1a73e8 0%, #0d47a1 60%, #00bcd4 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+    color: #fff;
+    position: relative;
+    overflow: hidden;
+}
+
+.chat-left::before {
+    content: '';
+    position: absolute;
+    top: -80px;
+    left: -80px;
+    width: 300px;
+    height: 300px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 50%;
+}
+
+.chat-left::after {
+    content: '';
+    position: absolute;
+    bottom: -60px;
+    right: -60px;
+    width: 250px;
+    height: 250px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 50%;
+}
+
+.chat-left h2 {
+    font-size: 2rem;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 30px;
+    position: relative;
+    z-index: 1;
+}
+
+.doctor-illustration {
+    width: 280px;
+    max-width: 100%;
+    position: relative;
+    z-index: 1;
+}
+
+/* RIGHT PANEL - chat */
+.chat-right {
+    flex: 0 0 420px;
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+    box-shadow: -4px 0 30px rgba(26,115,232,0.12);
+}
+
+.chat-header {
+    background: linear-gradient(135deg, #f59e0b 0%, #f97316 100%);
+    color: #fff;
+    padding: 18px 24px;
+    font-weight: 700;
+    font-size: 1.05rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.lang-select {
+    font-size: 0.75rem;
+    background: rgba(255,255,255,0.2);
+    border: 1px solid rgba(255,255,255,0.3);
+    color: #fff;
+    border-radius: 4px;
+    padding: 5px 10px;
+    margin-left: auto;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-weight: 600;
+}
+
+.lang-select:hover {
+    background: rgba(255,255,255,0.3);
+}
+
+.lang-select option {
+    background: #1a73e8;
+    color: #fff;
+    padding: 8px;
+}
+
+.lang-badge {
+    background: rgba(255,255,255,0.25);
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-size: 0.7rem;
+    margin-left: 8px;
+}
+
+.chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    min-height: 0;
+    max-height: calc(100vh - 260px);
+}
+
+.chat-messages::-webkit-scrollbar { width: 4px; }
+.chat-messages::-webkit-scrollbar-track { background: #f1f5f9; }
+.chat-messages::-webkit-scrollbar-thumb { background: #c3d9ff; border-radius: 4px; }
+
+.msg-bubble {
+    max-width: 88%;
+    padding: 10px 14px;
+    border-radius: 14px;
+    font-size: 0.85rem;
+    line-height: 1.5;
+    word-wrap: break-word;
+    white-space: pre-wrap;
+}
+
+.msg-bubble.bot {
+    background: #f0f4ff;
+    color: #1a1a2e;
+    border-bottom-left-radius: 4px;
+    align-self: flex-start;
+}
+
+.msg-bubble.user {
+    background: linear-gradient(135deg, #1a73e8, #0d47a1);
+    color: #fff;
+    border-bottom-right-radius: 4px;
+    align-self: flex-end;
+}
+
+.msg-bubble.bot .bot-avatar {
+    width: 26px;
+    height: 26px;
+    background: #1a73e8;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 4px;
+    font-size: 0.7rem;
+    color: #fff;
+}
+
+.disease-card {
+    background: #fff;
+    border: 2px solid #e8f0fe;
+    border-radius: 12px;
+    padding: 14px;
+    margin-top: 8px;
+    font-size: 0.82rem;
+}
+
+.disease-card.major { border-color: #fecdd3; background: #fff5f5; }
+.disease-card.minor { border-color: #bbf7d0; background: #f0fdf4; }
+.disease-card h6 { font-weight: 700; margin-bottom: 6px; font-size: 0.9rem; }
+.disease-card .badge-severity { font-size: 0.72rem; }
+
+.chat-input-area {
+    border-top: 1px solid #e5edf9;
+    padding: 16px;
+}
+
+.symptom-hint {
+    background: #f0f4ff;
+    border-radius: 8px;
+    padding: 6px 12px;
+    font-size: 0.75rem;
+    color: #6b7280;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.symptom-hint i {
+    color: #f59e0b;
+}
+
+.chat-input-wrap {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #f8fafc;
+    border-radius: 12px;
+    border: 1.5px solid #e5edf9;
+    padding: 8px 12px;
+    transition: border-color 0.2s;
+}
+
+.chat-input-wrap:focus-within { border-color: #1a73e8; }
+
+#chatInput {
+    border: none;
+    background: transparent;
+    flex: 1;
+    font-size: 0.88rem;
+    color: #1a1a2e;
+    outline: none;
+    font-family: 'Poppins', sans-serif;
+    resize: none;
+    min-height: 20px;
+    max-height: 80px;
+}
+
+#chatInput::placeholder { color: #9ca3af; }
+
+.send-btn {
+    width: 36px;
+    height: 36px;
+    background: linear-gradient(135deg, #1a73e8, #0d47a1);
+    border: none;
+    border-radius: 50%;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    flex-shrink: 0;
+}
+
+.send-btn:hover { transform: scale(1.1); }
+.send-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.typing-indicator {
+    display: none;
+    align-self: flex-start;
+    background: #f0f4ff;
+    border-radius: 14px;
+    border-bottom-left-radius: 4px;
+    padding: 10px 14px;
+}
+
+.typing-indicator span {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    background: #1a73e8;
+    border-radius: 50%;
+    margin: 0 2px;
+    animation: bounce 1.2s infinite;
+}
+
+.typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+.typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes bounce {
+    0%, 60%, 100% { transform: translateY(0); }
+    30% { transform: translateY(-8px); }
+}
+
+.language-info {
+    background: #e8f0fe;
+    border-left: 3px solid #1a73e8;
+    border-radius: 6px;
+    padding: 8px 12px;
+    margin-bottom: 12px;
+    font-size: 0.75rem;
+    color: #1a73e8;
+    display: none;
+}
+
+.language-info.show {
+    display: block;
+}
+
+@media (max-width: 900px) {
+    .chat-left { display: none; }
+    .chat-right { flex: 1; }
+}
+{% endblock %}
+
+{% block content %}
+<div class="chat-layout">
+    <!-- LEFT: Illustration -->
+    <div class="chat-left">
+        <h2>Welcome to AI Chat Room!</h2>
+
+        <!-- Doctor SVG Illustration -->
+        <svg class="doctor-illustration" viewBox="0 0 300 350" xmlns="http://www.w3.org/2000/svg">
+            <!-- Background circle -->
+            <circle cx="150" cy="200" r="120" fill="rgba(255,255,255,0.08)"/>
+
+            <!-- Doctor body -->
+            <ellipse cx="150" cy="260" rx="55" ry="70" fill="#fff"/>
+            <!-- White coat -->
+            <ellipse cx="150" cy="265" rx="52" ry="68" fill="#e8f0fe"/>
+
+            <!-- Stethoscope -->
+            <path d="M130 240 Q120 260 115 280 Q110 300 120 310 Q130 318 140 310" stroke="#1a73e8" stroke-width="3" fill="none" stroke-linecap="round"/>
+            <circle cx="120" cy="310" r="8" fill="#0d47a1"/>
+
+            <!-- Doctor head -->
+            <circle cx="150" cy="150" r="52" fill="#FDBCB4"/>
+            <!-- Hair -->
+            <ellipse cx="150" cy="107" rx="44" ry="24" fill="#5c3317"/>
+            <rect x="106" y="107" width="88" height="18" rx="5" fill="#5c3317"/>
+
+            <!-- Face features -->
+            <circle cx="136" cy="150" r="5" fill="#5c3317"/>
+            <circle cx="164" cy="150" r="5" fill="#5c3317"/>
+            <!-- Smile -->
+            <path d="M138 168 Q150 178 162 168" stroke="#c0392b" stroke-width="2" fill="none" stroke-linecap="round"/>
+
+            <!-- Doctor collar/tie -->
+            <path d="M135 202 L150 225 L165 202" fill="#1a73e8"/>
+
+            <!-- Arms -->
+            <ellipse cx="97" cy="250" rx="16" ry="45" fill="#e8f0fe" transform="rotate(-10,97,250)"/>
+            <ellipse cx="203" cy="250" rx="16" ry="45" fill="#e8f0fe" transform="rotate(10,203,250)"/>
+
+            <!-- Hands -->
+            <ellipse cx="88" cy="292" rx="14" ry="12" fill="#FDBCB4"/>
+            <ellipse cx="212" cy="292" rx="14" ry="12" fill="#FDBCB4"/>
+
+            <!-- Clipboard in right hand -->
+            <rect x="200" y="265" width="28" height="36" rx="4" fill="#fff" stroke="#1a73e8" stroke-width="1.5"/>
+            <rect x="204" y="272" width="20" height="3" rx="1.5" fill="#9ca3af"/>
+            <rect x="204" y="279" width="20" height="3" rx="1.5" fill="#9ca3af"/>
+            <rect x="204" y="286" width="14" height="3" rx="1.5" fill="#9ca3af"/>
+
+            <!-- Laptop decoration -->
+            <rect x="60" y="310" width="80" height="50" rx="6" fill="#1a73e8" opacity="0.6"/>
+            <rect x="64" y="314" width="72" height="40" rx="4" fill="#e8f0fe"/>
+            <rect x="50" y="358" width="100" height="8" rx="4" fill="#0d47a1" opacity="0.6"/>
+
+            <!-- Speech bubble -->
+            <rect x="185" y="100" width="90" height="55" rx="10" fill="#fff" opacity="0.95"/>
+            <polygon points="190,155 185,168 200,155" fill="#fff" opacity="0.95"/>
+            <text x="195" y="122" font-size="9" fill="#1a73e8" font-weight="bold" font-family="Arial">How can</text>
+            <text x="195" y="135" font-size="9" fill="#1a73e8" font-weight="bold" font-family="Arial">I help you</text>
+            <text x="195" y="148" font-size="9" fill="#1a73e8" font-weight="bold" font-family="Arial">today? 😊</text>
+
+            <!-- Plant decoration -->
+            <rect x="20" y="295" width="14" height="40" rx="4" fill="#8B6914"/>
+            <ellipse cx="27" cy="290" rx="20" ry="28" fill="#66bb6a"/>
+            <ellipse cx="15" cy="280" rx="14" ry="18" fill="#81c784"/>
+            <ellipse cx="38" cy="278" rx="13" ry="20" fill="#4caf50"/>
+        </svg>
+
+        <div style="text-align:center;margin-top:20px;position:relative;z-index:1;">
+            <p style="opacity:0.85;font-size:0.9rem;">Powered by Decision Tree AI</p>
+            <div style="display:flex;gap:10px;justify-content:center;margin-top:8px;flex-wrap:wrap;">
+                <span style="background:rgba(255,255,255,0.2);border-radius:20px;padding:4px 12px;font-size:0.75rem;">🩺 Symptom Analysis</span>
+                <span style="background:rgba(255,255,255,0.2);border-radius:20px;padding:4px 12px;font-size:0.75rem;">💊 Disease Prediction</span>
+                <span style="background:rgba(255,255,255,0.2);border-radius:20px;padding:4px 12px;font-size:0.75rem;">🌍 Multilingual Support</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- RIGHT: Chat -->
+    <div class="chat-right">
+        <!-- Header -->
+        <div class="chat-header">
+            <div style="width:38px;height:38px;background:rgba(255,255,255,0.25);border-radius:50%;display:flex;align-items:center;justify-content:center;">
+                <i class="fas fa-robot"></i>
+            </div>
+            <span>CHAT WITH AI</span>
+            <span class="lang-badge" id="currentLang">🌍 English</span>
+            <select class="lang-select" id="langSelect" title="Select Language">
+                <option value="english" selected>🌍 English (English)</option>
+                <option value="hindi">🇮🇳 हिंदी (Hindi)</option>
+                <option value="marathi">🇮🇳 मराठी (Marathi)</option>
+                <option value="kannada">🇮🇳 ಕನ್ನಡ (Kannada)</option>
+                <option value="telugu">🇮🇳 తెలుగు (Telugu)</option>
+                <option value="tamil">🇮🇳 தமிழ் (Tamil)</option>
+            </select>
+        </div>
+
+        <!-- Messages -->
+        <div class="chat-messages" id="chatMessages">
+            <!-- Language Info -->
+            <div class="language-info" id="languageInfo">
+                <i class="fas fa-info-circle me-1"></i>
+                <span id="langInfoText">Language changed to English. Responses will be in English.</span>
+            </div>
+
+            <!-- Existing history -->
+            {% for chat in history %}
+            <div class="msg-bubble user">{{ chat.message }}</div>
+            <div class="msg-bubble bot">{{ chat.response }}</div>
+            {% empty %}
+            <div class="msg-bubble bot">
+                <div class="bot-avatar"><i class="fas fa-robot"></i></div><br>
+                Hello {{ request.user.first_name|default:request.user.username }}! 👋 I'm your AI Healthcare Assistant.<br><br>
+                Please describe the symptoms you are experiencing and I'll analyze them for you.
+            </div>
+            {% endfor %}
+
+            <!-- Typing indicator -->
+            <div class="typing-indicator" id="typingIndicator">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+
+        <!-- Input -->
+        <div class="chat-input-area">
+            <div class="symptom-hint">
+                <i class="fas fa-lightbulb"></i>
+                <span id="hintText">Enter the symptom you are experiencing</span>
+            </div>
+            <div class="chat-input-wrap">
+                <textarea id="chatInput" rows="1" placeholder="Enter a message..."></textarea>
+                <button class="send-btn" id="sendBtn" title="Send">
+                    <i class="fas fa-paper-plane" style="font-size:0.8rem;"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Language support configuration
+const languageConfig = {
+    english: {
+        name: 'English',
+        flag: '🌍',
+        hint: 'Enter the symptom you are experiencing',
+        langInfo: 'Language changed to English. Responses will be in English.',
+        placeholder: 'Enter a message...'
+    },
+    hindi: {
+        name: 'हिंदी (Hindi)',
+        flag: '🇮🇳',
+        hint: 'आप जिन लक्षणों का अनुभव कर रहे हैं उन्हें दर्ज करें',
+        langInfo: 'भाषा हिंदी में बदल गई है। प्रतिक्रियाएं हिंदी में होंगी।',
+        placeholder: 'एक संदेश दर्ज करें...'
+    },
+    marathi: {
+        name: 'मराठी (Marathi)',
+        flag: '🇮🇳',
+        hint: 'आप अनुभवत असल्या लक्षणांचे विवरण प्रविष्ट करा',
+        langInfo: 'भाषा मराठीमध्ये बदलली आहे. प्रतिक्रिया मराठीमध्ये असतील.',
+        placeholder: 'एक संदेश प्रविष्ट करा...'
+    },
+    kannada: {
+        name: 'ಕನ್ನಡ (Kannada)',
+        flag: '🇮🇳',
+        hint: 'ನೀವು ಅನುಭವಿಸುತ್ತಿರುವ ರೋಗ ಲಕ್ಷಣಗಳನ್ನು ನಮೂದಿಸಿ',
+        langInfo: 'ಭಾಷೆಯನ್ನು ಕನ್ನಡಕ್ಕೆ ಬದಲಾಯಿಸಲಾಗಿದೆ. ಪ್ರತಿಕ್ರಿಯೆಗಳು ಕನ್ನಡದಲ್ಲಿರುತ್ತವೆ.',
+        placeholder: 'ಒಂದು ಸಂದೇಶವನ್ನು ನಮೂದಿಸಿ...'
+    },
+    telugu: {
+        name: 'తెలుగు (Telugu)',
+        flag: '🇮🇳',
+        hint: 'మీరు ఆనుభవిస్తున్న లక్షణాలను నమోదు చేయండి',
+        langInfo: 'భాష తెలుగుకు మార్చబడింది. ప్రతిస్పందనలు తెలుగులో ఉంటాయి.',
+        placeholder: 'ఒక సందేశాన్ని నమోదు చేయండి...'
+    },
+    tamil: {
+        name: 'தமிழ் (Tamil)',
+        flag: '🇮🇳',
+        hint: 'நீங்கள் அனுபவிக்கும் அறிகுறிகளை உள்ளிடவும்',
+        langInfo: 'மொழி தமிழுக்கு மாற்றப்பட்டுள்ளது. பதிலுகள் தமிழில் இருக்கும்.',
+        placeholder: 'ஒரு செய்தியை உள்ளிடவும்...'
+    }
+};
+
+// Current language state
+let currentLanguage = 'english';
+
+const chatMessages = document.getElementById('chatMessages');
+const chatInput = document.getElementById('chatInput');
+const sendBtn = document.getElementById('sendBtn');
+const typingIndicator = document.getElementById('typingIndicator');
+const langSelect = document.getElementById('langSelect');
+const currentLangBadge = document.getElementById('currentLang');
+const langInfoDiv = document.getElementById('languageInfo');
+const langInfoText = document.getElementById('langInfoText');
+const hintText = document.getElementById('hintText');
+
+// Initialize
+function initializeLanguage() {
+    updateLanguageUI('english');
+}
+
+// Handle language change
+langSelect.addEventListener('change', function(e) {
+    currentLanguage = e.target.value;
+    updateLanguageUI(currentLanguage);
+    showLanguageInfo();
+});
+
+// Update UI based on language
+function updateLanguageUI(lang) {
+    const config = languageConfig[lang];
+    
+    currentLangBadge.textContent = `${config.flag} ${config.name.split('(')[0].trim()}`;
+    hintText.textContent = config.hint;
+    chatInput.placeholder = config.placeholder;
+    langInfoText.textContent = config.langInfo;
+    
+    // Save language preference to localStorage
+    localStorage.setItem('selectedLanguage', lang);
+}
+
+// Show language change notification
+function showLanguageInfo() {
+    langInfoDiv.classList.add('show');
+    setTimeout(() => {
+        langInfoDiv.classList.remove('show');
+    }, 3000);
+}
+
+// Restore language preference on page load
+window.addEventListener('DOMContentLoaded', function() {
+    const savedLanguage = localStorage.getItem('selectedLanguage') || 'english';
+    langSelect.value = savedLanguage;
+    currentLanguage = savedLanguage;
+    updateLanguageUI(savedLanguage);
+});
+
+function scrollToBottom() {
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+scrollToBottom();
+
+function addMessage(text, type, diseaseData) {
+    // Remove typing indicator temporarily
+    typingIndicator.style.display = 'none';
+
+    const bubble = document.createElement('div');
+    bubble.className = `msg-bubble ${type}`;
+
+    if (type === 'bot') {
+        // Format markdown-like bold
+        let formatted = text
+            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+            .replace(/\n/g, '<br>');
+        bubble.innerHTML = formatted;
+
+        // Disease card
+        if (diseaseData) {
+            const severity = diseaseData.severity || 'Minor';
+            const card = document.createElement('div');
+            card.className = `disease-card ${severity.toLowerCase()}`;
+            const icon = severity === 'Major' ? '🔴' : '🟡';
+            card.innerHTML = `
+                <h6>${icon} ${diseaseData.name} 
+                    <span class="badge ${severity === 'Major' ? 'bg-danger' : 'bg-warning text-dark'} badge-severity ms-1">${severity}</span>
+                </h6>
+                <div style="color:#6b7280;font-size:0.8rem;">
+                    <i class="fas fa-shield-alt me-1" style="color:#1a73e8;"></i>
+                    ${(diseaseData.precautions || []).slice(0,3).join(' • ')}
+                </div>`;
+            bubble.appendChild(card);
+        }
+    } else {
+        bubble.textContent = text;
+    }
+
+    chatMessages.insertBefore(bubble, typingIndicator);
+    scrollToBottom();
+}
+
+function showTyping() {
+    typingIndicator.style.display = 'flex';
+    chatMessages.appendChild(typingIndicator);
+    scrollToBottom();
+}
+
+async function sendMessage() {
+    const msg = chatInput.value.trim();
+    if (!msg) return;
+
+    addMessage(msg, 'user');
+    chatInput.value = '';
+    chatInput.style.height = 'auto';
+    sendBtn.disabled = true;
+    showTyping();
+
+    try {
+        const resp = await fetch('/api/chat/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCsrf(),
+            },
+            body: JSON.stringify({ 
+                message: msg,
+                language: currentLanguage 
+            }),
+        });
+        const data = await resp.json();
+        addMessage(data.response || 'Sorry, I could not process that.', 'bot', data.disease || null);
+    } catch (e) {
+        addMessage('Connection error. Please try again.', 'bot');
+    } finally {
+        sendBtn.disabled = false;
+        chatInput.focus();
+    }
+}
+
+function getCsrf() {
+    return document.cookie.split(';').find(c => c.trim().startsWith('csrftoken='))?.split('=')[1] || '';
+}
+
+sendBtn.addEventListener('click', sendMessage);
+
+chatInput.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        sendMessage();
+    }
+});
+
+chatInput.addEventListener('input', function() {
+    this.style.height = 'auto';
+    this.style.height = Math.min(this.scrollHeight, 80) + 'px';
+});
+
+// Initialize on load
+initializeLanguage();
+</script>
+{% endblock %}

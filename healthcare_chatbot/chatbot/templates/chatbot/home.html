@@ -1,0 +1,266 @@
+{% extends 'chatbot/base.html' %}
+
+{% block title %}Home – Healthcare Chatbot Using AI{% endblock %}
+
+{% block extra_css %}
+.hero {
+    background: linear-gradient(135deg, rgba(13,71,161,0.85) 0%, rgba(26,115,232,0.7) 100%),
+                url('https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=1400') center/cover no-repeat;
+    min-height: 520px;
+    display: flex;
+    align-items: center;
+    color: #fff;
+    position: relative;
+    overflow: hidden;
+}
+
+.hero::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    right: 0;
+    height: 60px;
+    background: var(--light-bg);
+    clip-path: ellipse(55% 100% at 50% 100%);
+}
+
+.hero h1 { font-size: 3rem; font-weight: 700; line-height: 1.2; margin-bottom: 16px; }
+.hero .tagline { font-size: 1.2rem; opacity: 0.9; margin-bottom: 32px; font-style: italic; }
+
+.btn-hero-primary {
+    background: #fff;
+    color: #1a73e8;
+    border-radius: 10px;
+    font-weight: 700;
+    padding: 13px 30px;
+    text-decoration: none;
+    display: inline-block;
+    margin-right: 12px;
+    margin-bottom: 10px;
+    transition: all 0.25s;
+    font-size: 0.92rem;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
+
+.btn-hero-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+    color: #0d47a1;
+}
+
+.btn-hero-secondary {
+    background: transparent;
+    color: #fff;
+    border: 2px solid rgba(255,255,255,0.7);
+    border-radius: 10px;
+    font-weight: 700;
+    padding: 12px 30px;
+    text-decoration: none;
+    display: inline-block;
+    margin-bottom: 10px;
+    transition: all 0.25s;
+    font-size: 0.92rem;
+}
+
+.btn-hero-secondary:hover {
+    background: rgba(255,255,255,0.2);
+    color: #fff;
+    border-color: #fff;
+}
+
+/* Why choose section */
+.why-card {
+    background: linear-gradient(135deg, #1a73e8 0%, #0d47a1 100%);
+    color: #fff;
+    border-radius: 16px;
+    padding: 28px;
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+}
+
+.why-card::before {
+    content: '';
+    position: absolute;
+    top: -30px;
+    right: -30px;
+    width: 100px;
+    height: 100px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 50%;
+}
+
+.why-card h4 { font-weight: 700; font-size: 1.15rem; margin-bottom: 10px; }
+.why-card p { font-size: 0.88rem; opacity: 0.88; }
+
+/* Feature icons */
+.feature-icon-box {
+    width: 70px;
+    height: 70px;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 16px;
+    font-size: 1.8rem;
+}
+
+.feature-card {
+    background: #fff;
+    border-radius: 16px;
+    padding: 30px 24px;
+    text-align: center;
+    box-shadow: 0 4px 20px rgba(26,115,232,0.1);
+    transition: all 0.3s;
+    height: 100%;
+}
+
+.feature-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(26,115,232,0.2);
+}
+
+.feature-card h5 { font-weight: 700; margin-bottom: 10px; color: #1a1a2e; }
+.feature-card p { font-size: 0.88rem; color: #6b7280; }
+
+.section-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #1a1a2e;
+    margin-bottom: 8px;
+}
+
+.section-sub { color: #6b7280; margin-bottom: 40px; }
+{% endblock %}
+
+{% block content %}
+<!-- HERO SECTION -->
+<section class="hero">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <h1>WELCOME</h1>
+                <p class="tagline">"Caring for you, powered by AI"</p>
+                <a href="{% url 'contact' %}" class="btn-hero-primary">
+                    <i class="fas fa-calendar-check me-2"></i>BOOK AN APPOINTMENT
+                </a>
+                <a href="{% url 'chat' %}" class="btn-hero-secondary">
+                    <i class="fas fa-robot me-2"></i>CHAT WITH AI
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- WHY CHOOSE SECTION -->
+<section class="py-5 mt-4">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-5 mb-4 mb-lg-0">
+                <div class="why-card">
+                    <h4><i class="fas fa-robot me-2"></i>Why Choose Healthcare Chatbot Using AI?</h4>
+                    <p>Healthcare Chatbot Using AI provides personalized healthcare support using artificial intelligence. Get instant medical guidance, symptom analysis, and connect with nearby hospitals — all from one platform.</p>
+                    <div class="mt-3">
+                        <span style="background:rgba(255,255,255,0.2);border-radius:20px;padding:5px 14px;font-size:0.8rem;margin-right:8px;display:inline-block;margin-bottom:6px;">🤖 AI-Powered</span>
+                        <span style="background:rgba(255,255,255,0.2);border-radius:20px;padding:5px 14px;font-size:0.8rem;display:inline-block;margin-bottom:6px;">🔒 Secure</span>
+                        <span style="background:rgba(255,255,255,0.2);border-radius:20px;padding:5px 14px;font-size:0.8rem;display:inline-block;margin-bottom:6px;">⚡ Instant</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-7">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <div class="feature-card">
+                            <div class="feature-icon-box" style="background:#e8f0fe;">
+                                <i class="fas fa-clock" style="color:#1a73e8;"></i>
+                            </div>
+                            <h5>24/7 Health Support</h5>
+                            <p>Round-the-clock AI assistance for your health queries.</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="feature-card">
+                            <div class="feature-icon-box" style="background:#fce8e6;">
+                                <i class="fas fa-ambulance" style="color:#e53935;"></i>
+                            </div>
+                            <h5>Emergency</h5>
+                            <p>Quick guidance and nearest hospital finder for emergencies.</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="feature-card">
+                            <div class="feature-icon-box" style="background:#e8f5e9;">
+                                <i class="fas fa-user-md" style="color:#43a047;"></i>
+                            </div>
+                            <h5>Personalised Health</h5>
+                            <p>Tailored health recommendations based on your symptoms.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- SERVICES SECTION -->
+<section class="py-5" style="background:#fff;">
+    <div class="container">
+        <div class="text-center">
+            <h2 class="section-title">Our Services</h2>
+            <p class="section-sub">Comprehensive AI-powered healthcare at your fingertips</p>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-3">
+                <div class="feature-card">
+                    <div class="feature-icon-box" style="background:#e8f0fe;">
+                        <i class="fas fa-stethoscope" style="color:#1a73e8;"></i>
+                    </div>
+                    <h5>Symptom Analysis</h5>
+                    <p>Describe your symptoms and get instant AI-powered disease prediction.</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="feature-card">
+                    <div class="feature-icon-box" style="background:#fef3e2;">
+                        <i class="fas fa-calendar-alt" style="color:#f59e0b;"></i>
+                    </div>
+                    <h5>Appointment Booking</h5>
+                    <p>Schedule appointments with doctors at your convenience.</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="feature-card">
+                    <div class="feature-icon-box" style="background:#e8f5e9;">
+                        <i class="fas fa-hospital-alt" style="color:#43a047;"></i>
+                    </div>
+                    <h5>Nearby Hospitals</h5>
+                    <p>Find the nearest hospitals and clinics with map integration.</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="feature-card">
+                    <div class="feature-icon-box" style="background:#fce8e6;">
+                        <i class="fas fa-brain" style="color:#e53935;"></i>
+                    </div>
+                    <h5>Mental Health Support</h5>
+                    <p>Access mental health resources and supportive guidance.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA SECTION -->
+<section class="py-5">
+    <div class="container">
+        <div style="background:linear-gradient(135deg,#1a73e8,#00bcd4);border-radius:20px;padding:50px 40px;text-align:center;color:#fff;">
+            <h3 style="font-size:2rem;font-weight:700;margin-bottom:12px;">Ready to get started?</h3>
+            <p style="opacity:0.9;margin-bottom:28px;font-size:1.05rem;">Chat with our AI Health Assistant now and get instant medical guidance.</p>
+            <a href="{% url 'chat' %}" style="background:#fff;color:#1a73e8;border-radius:10px;font-weight:700;padding:13px 36px;text-decoration:none;font-size:1rem;box-shadow:0 4px 15px rgba(0,0,0,0.2);display:inline-block;transition:all 0.25s;">
+                <i class="fas fa-robot me-2"></i>Chat With AI
+            </a>
+        </div>
+    </div>
+</section>
+{% endblock %}

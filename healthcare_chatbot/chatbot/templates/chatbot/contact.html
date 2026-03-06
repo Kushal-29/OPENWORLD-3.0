@@ -1,0 +1,218 @@
+{% extends 'chatbot/base.html' %}
+{% block title %}Contact Us – Healthcare Chatbot{% endblock %}
+
+{% block extra_css %}
+.page-hero {
+    background: linear-gradient(135deg, #1a73e8 0%, #00bcd4 100%);
+    color: #fff;
+    padding: 50px 0;
+    text-align: center;
+}
+
+.page-hero h2 { font-size: 2rem; font-weight: 700; }
+
+.contact-card {
+    background: #fff;
+    border-radius: 16px;
+    padding: 28px;
+    box-shadow: 0 4px 20px rgba(26,115,232,0.1);
+    text-align: center;
+    height: 100%;
+    transition: all 0.3s;
+}
+
+.contact-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 30px rgba(26,115,232,0.2);
+}
+
+.contact-icon {
+    width: 65px;
+    height: 65px;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 16px;
+    font-size: 1.6rem;
+}
+
+.contact-form {
+    background: #fff;
+    border-radius: 20px;
+    padding: 40px;
+    box-shadow: 0 4px 30px rgba(26,115,232,0.12);
+}
+
+.form-label {
+    font-weight: 600;
+    font-size: 0.88rem;
+    color: #1a1a2e;
+    margin-bottom: 8px;
+    display: block;
+}
+
+.form-control {
+    border: 1.5px solid #e5edf9;
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 0.9rem;
+    transition: all 0.25s;
+    background: #f9fbfd;
+}
+
+.form-control:focus {
+    background: #fff;
+    border-color: #1a73e8;
+    box-shadow: 0 0 0 3px rgba(26,115,232,0.1);
+    color: #1a1a2e;
+}
+
+.form-control::placeholder {
+    color: #9ca3af;
+}
+
+textarea.form-control {
+    resize: vertical;
+    min-height: 140px;
+    font-family: 'Poppins', sans-serif;
+}
+
+.btn-submit {
+    background: linear-gradient(135deg, #1a73e8 0%, #0d47a1 100%);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    padding: 12px 36px;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.25s;
+    box-shadow: 0 4px 15px rgba(26,115,232,0.3);
+}
+
+.btn-submit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(26,115,232,0.4);
+}
+
+.btn-submit:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.info-box {
+    background: #e8f0fe;
+    border-left: 4px solid #1a73e8;
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 24px;
+}
+
+.info-box h6 {
+    color: #1a73e8;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+.info-box p {
+    color: #6b7280;
+    font-size: 0.85rem;
+    margin: 0;
+}
+
+@media (max-width: 768px) {
+    .contact-form {
+        padding: 24px;
+    }
+}
+{% endblock %}
+
+{% block content %}
+<section class="page-hero">
+    <div class="container">
+        <h2><i class="fas fa-envelope me-3"></i>Contact Us</h2>
+        <p style="opacity:0.85;margin-top:8px;">We're here to help. Reach out to us anytime.</p>
+    </div>
+</section>
+
+<div class="container py-5">
+    <div class="row g-4 mb-5">
+        <div class="col-md-4">
+            <div class="contact-card">
+                <div class="contact-icon" style="background:#e8f0fe;"><i class="fas fa-phone-alt" style="color:#1a73e8;"></i></div>
+                <h6 style="font-weight:700;">Phone</h6>
+                <p style="color:#6b7280;font-size:0.88rem;">+91 9381416362</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="contact-card">
+                <div class="contact-icon" style="background:#e8f5e9;"><i class="fas fa-envelope" style="color:#43a047;"></i></div>
+                <h6 style="font-weight:700;">Email</h6>
+                <p style="color:#6b7280;font-size:0.88rem;">yferoza12@gmail.com</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="contact-card">
+                <div class="contact-icon" style="background:#fef3e2;"><i class="fas fa-map-marker-alt" style="color:#f59e0b;"></i></div>
+                <h6 style="font-weight:700;">Location</h6>
+                <p style="color:#6b7280;font-size:0.88rem;">satelite,banglore,<br>karnataka, India</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="contact-form">
+                <h4 style="font-weight:700;color:#1a1a2e;margin-bottom:24px;">Send us a Message</h4>
+                
+                <div class="info-box">
+                    <h6><i class="fas fa-info-circle me-2"></i>How This Works</h6>
+                    <p>Fill out the form below and your message will be sent directly to our email. We typically respond within 24-48 hours. All fields marked with * are required.</p>
+                </div>
+
+                <form action="https://formspree.io/f/mvzbvale" method="POST" id="contactForm">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label" for="contactName">Your Name <span style="color:#ef4444;">*</span></label>
+                            <input type="text" class="form-control" id="contactName" name="name" placeholder="Full name" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" for="contactEmail">Email <span style="color:#ef4444;">*</span></label>
+                            <input type="email" class="form-control" id="contactEmail" name="email" placeholder="your@email.com" required>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label" for="contactSubject">Subject <span style="color:#ef4444;">*</span></label>
+                            <input type="text" class="form-control" id="contactSubject" name="subject" placeholder="What is this about?" required>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label" for="contactMessage">Message <span style="color:#ef4444;">*</span></label>
+                            <textarea class="form-control" id="contactMessage" name="message" placeholder="Write your message here..." required></textarea>
+                        </div>
+                        <div class="col-12">
+                            <input type="hidden" name="_next" value="{% url 'contact' %}?sent=true">
+                            <input type="hidden" name="_captcha" value="false">
+                            <button type="submit" class="btn-submit">
+                                <i class="fas fa-paper-plane me-2"></i>Send Message
+                            </button>
+                        </div>
+                    </div>
+                </form>
+
+                <!-- Success message if redirected back with sent=true -->
+                {% if request.GET.sent == 'true' %}
+                <div style="margin-top: 20px; padding: 16px; background: #e7f5e7; border: 1.5px solid #22c55e; border-radius: 8px; color: #16a34a; text-align: center; font-weight: 600;">
+                    <i class="fas fa-check-circle me-2"></i>
+                    Thank you! Your message has been sent successfully. We'll get back to you within 24-48 hours.
+                </div>
+                {% endif %}
+
+                <div style="margin-top: 24px; padding: 16px; background: #f0f4ff; border-radius: 8px; text-align: center; font-size: 0.85rem; color: #6b7280;">
+                    <i class="fas fa-shield-alt me-2" style="color: #1a73e8;"></i>
+                    Your information is secure and will only be used to respond to your inquiry.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
